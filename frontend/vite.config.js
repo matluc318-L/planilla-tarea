@@ -2,7 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => ({
-  base: mode === "production" ? "/planillas/" : "/",
+  // GitHub Pages (project pages) suele servir en: /<repo-name>/
+  // Por eso dejamos que el workflow inyecte VITE_BASE_URL.
+  base: mode === "production" ? process.env.VITE_BASE_URL || "/" : "/",
   plugins: [react()],
   server: {
     port: 5173,
@@ -12,3 +14,4 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
+
