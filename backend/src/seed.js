@@ -1,21 +1,40 @@
 import "dotenv/config";
+import fs from "fs";
+import path from "path";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
-import { initDb, run, get } from "./db/index.js";
+import { initDb, run, get, getDb } from "./db/index.js";
 
 export async function autoSeed() {
-  const existing = await get(`SELECT COUNT(*) as c FROM usuarios`);
+  let existing;
+  try {
+    existing = await get(`SELECT COUNT(*) as c FROM usuarios`);
+  } catch {
+    existing = { c: 0 };
+  }
   if (existing.c > 0) {
     console.log("BD ya tiene datos. Seed automático omitido.");
     return;
   }
 
-  const partial = await get(`SELECT COUNT(*) as c FROM areas`);
-  if (partial.c > 0) {
-    console.log("BD con datos parciales. Limpiando...");
-    for (const t of ["asistencias", "notificaciones", "planillas", "usuarios", "empleados", "cargos", "areas"]) {
-      await run(`DELETE FROM ${t}`);
-    }
+  let hasPartial = false;
+  try {
+    const a = await get(`SELECT COUNT(*) as c FROM areas`);
+    hasPartial = a.c > 0;
+  } catch {
+    hasPartial = false;
+  }
+
+  if (hasPartial) {
+    console.log("BD con datos parciales. Borrando archivo y recreando...");
+    getDb().close();
+    const dbPath = path.isAbsolute(process.env.DATABASE_PATH || "./data/empresa.db")
+      ? process.env.DATABASE_PATH
+      : path.resolve(process.cwd(), process.env.DATABASE_PATH || "./data/empresa.db");
+    try { fs.unlinkSync(dbPath); } catch {}
+    try { fs.unlinkSync(dbPath + "-wal"); } catch {}
+    try { fs.unlinkSync(dbPath + "-shm"); } catch {}
+    await initDb();
   }
 
   const now = new Date().toISOString();
