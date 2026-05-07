@@ -6,6 +6,7 @@ import { initDb } from "./db/index.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { uploadsPublicPath } from "./middlewares/upload.middleware.js";
 import { HttpError } from "./utils/httpError.js";
+import { autoSeed } from "./seed.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import usuarioRoutes from "./routes/usuario.routes.js";
@@ -19,6 +20,7 @@ import reporteRoutes from "./routes/reporte.routes.js";
 import secretariaRoutes from "./routes/secretaria.routes.js";
 
 await initDb();
+await autoSeed();
 
 const app = express();
 
