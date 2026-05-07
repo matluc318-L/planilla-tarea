@@ -55,22 +55,22 @@ export async function autoSeed() {
   await run(`INSERT INTO cargos (id, nombre, areaId, createdAt) VALUES (?, ?, ?, ?)`, [cargoDev, "Desarrollador", areaTi, now]);
 
   await run(
-    `INSERT INTO empleados (id, nombres, apellidos, dni, correo, telefono, direccion, cargoId, areaId, salario, fechaIngreso, estado, fotoPath, createdAt, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVO', NULL, ?, ?)`,
-    [emp1, "María", "López", "12345678", "maria.lopez@empresa.demo", "999111222", "Av. Principal 123", cargoGer, areaAdmin, 8500, "2023-01-15", now, now]
+    `INSERT INTO empleados (id, nombres, apellidos, dni, correo, telefono, direccion, cargoId, areaId, salario, fechaIngreso, estado, fotoPath, ownerAdminId, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVO', NULL, ?, ?, ?)`,
+    [emp1, "María", "López", "12345678", "maria.lopez@empresa.demo", "999111222", "Av. Principal 123", cargoGer, areaAdmin, 8500, "2023-01-15", userAdmin, now, now]
   );
   await run(
-    `INSERT INTO empleados (id, nombres, apellidos, dni, correo, telefono, direccion, cargoId, areaId, salario, fechaIngreso, estado, fotoPath, createdAt, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVO', NULL, ?, ?)`,
-    [emp2, "Carlos", "Vargas", "87654321", "carlos.vargas@empresa.demo", "999333444", "Jr. Los Olivos 45", cargoDev, areaTi, 6200, "2024-06-01", now, now]
+    `INSERT INTO empleados (id, nombres, apellidos, dni, correo, telefono, direccion, cargoId, areaId, salario, fechaIngreso, estado, fotoPath, ownerAdminId, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVO', NULL, ?, ?, ?)`,
+    [emp2, "Carlos", "Vargas", "87654321", "carlos.vargas@empresa.demo", "999333444", "Jr. Los Olivos 45", cargoDev, areaTi, 6200, "2024-06-01", userAdmin, now, now]
   );
 
   const hash = (p) => bcrypt.hashSync(p, 10);
 
-  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, createdAt) VALUES (?, NULL, ?, ?, 'ADMIN', NULL, NULL, ?)`, [userAdmin, "admin@empresa.demo", hash("Admin123!"), now]);
-  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, createdAt) VALUES (?, NULL, ?, ?, 'RRHH', NULL, NULL, ?)`, [userRrhh, "rrhh@empresa.demo", hash("Rrhh123!"), now]);
-  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, createdAt) VALUES (?, NULL, ?, ?, 'EMPLEADO', ?, NULL, ?)`, [userEmp, "empleado@empresa.demo", hash("Emp123!"), emp2, now]);
-  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, createdAt) VALUES (?, NULL, ?, ?, 'SECRETARIA', NULL, NULL, ?)`, [userSec, "secretaria@empresa.demo", hash("Sec123!"), now]);
+  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, ownerAdminId, createdAt) VALUES (?, NULL, ?, ?, 'ADMIN', NULL, NULL, ?, ?)`, [userAdmin, "admin@empresa.demo", hash("Admin123!"), userAdmin, now]);
+  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, ownerAdminId, createdAt) VALUES (?, NULL, ?, ?, 'RRHH', NULL, NULL, ?, ?)`, [userRrhh, "rrhh@empresa.demo", hash("Rrhh123!"), userAdmin, now]);
+  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, ownerAdminId, createdAt) VALUES (?, NULL, ?, ?, 'EMPLEADO', ?, NULL, ?, ?)`, [userEmp, "empleado@empresa.demo", hash("Emp123!"), emp2, userAdmin, now]);
+  await run(`INSERT INTO usuarios (id, username, email, password, rol, empleadoId, planillaAccessUntil, ownerAdminId, createdAt) VALUES (?, NULL, ?, ?, 'SECRETARIA', NULL, NULL, ?, ?)`, [userSec, "secretaria@empresa.demo", hash("Sec123!"), userAdmin, now]);
 
   const asId = randomUUID();
   const hoy = now.slice(0, 10);
