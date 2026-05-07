@@ -20,7 +20,11 @@ import reporteRoutes from "./routes/reporte.routes.js";
 import secretariaRoutes from "./routes/secretaria.routes.js";
 
 await initDb();
-await autoSeed();
+try {
+  await autoSeed();
+} catch (e) {
+  console.error("[app] Error en seed automático:", e.message);
+}
 
 const app = express();
 

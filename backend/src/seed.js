@@ -4,10 +4,13 @@ import { randomUUID } from "crypto";
 import { initDb, run, get, getDb } from "./db/index.js";
 
 export async function autoSeed() {
+  console.log("[seed] autoSeed iniciando...");
   let existing;
   try {
     existing = await get(`SELECT COUNT(*) as c FROM usuarios`);
-  } catch {
+    console.log("[seed] usuarios count:", existing?.c);
+  } catch (e) {
+    console.log("[seed] error usuarios query:", e.message);
     existing = { c: 0 };
   }
   if (existing.c > 0) {
@@ -18,8 +21,10 @@ export async function autoSeed() {
   let hasPartial = false;
   try {
     const a = await get(`SELECT COUNT(*) as c FROM areas`);
+    console.log("[seed] areas count:", a?.c);
     hasPartial = a.c > 0;
-  } catch {
+  } catch (e) {
+    console.log("[seed] error areas query:", e.message);
     hasPartial = false;
   }
 
@@ -31,6 +36,7 @@ export async function autoSeed() {
       db.exec(`DELETE FROM ${t}`);
     }
     db.pragma("foreign_keys = ON");
+    console.log("[seed] tablas limpiadas");
   }
 
   const now = new Date().toISOString();
