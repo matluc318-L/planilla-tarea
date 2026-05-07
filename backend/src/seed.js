@@ -1,6 +1,4 @@
 import "dotenv/config";
-import fs from "fs";
-import path from "path";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import { initDb, run, get, getDb } from "./db/index.js";
@@ -26,15 +24,13 @@ export async function autoSeed() {
   }
 
   if (hasPartial) {
-    console.log("BD con datos parciales. Borrando archivo y recreando...");
-    getDb().close();
-    const dbPath = path.isAbsolute(process.env.DATABASE_PATH || "./data/empresa.db")
-      ? process.env.DATABASE_PATH
-      : path.resolve(process.cwd(), process.env.DATABASE_PATH || "./data/empresa.db");
-    try { fs.unlinkSync(dbPath); } catch {}
-    try { fs.unlinkSync(dbPath + "-wal"); } catch {}
-    try { fs.unlinkSync(dbPath + "-shm"); } catch {}
-    await initDb();
+    console.log("BD con datos parciales. Limpiando tablas...");
+    const db = getDb();
+    db.pragma("foreign_keys = OFF");
+    for (const t of ["asistencias", "notificaciones", "planillas", "usuarios", "empleados", "cargos", "areas"]) {
+      db.exec(`DELETE FROM ${t}`);
+    }
+    db.pragma("foreign_keys = ON");
   }
 
   const now = new Date().toISOString();
