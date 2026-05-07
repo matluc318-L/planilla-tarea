@@ -10,6 +10,14 @@ export async function autoSeed() {
     return;
   }
 
+  const partial = await get(`SELECT COUNT(*) as c FROM areas`);
+  if (partial.c > 0) {
+    console.log("BD con datos parciales. Limpiando...");
+    for (const t of ["asistencias", "notificaciones", "planillas", "usuarios", "empleados", "cargos", "areas"]) {
+      await run(`DELETE FROM ${t}`);
+    }
+  }
+
   const now = new Date().toISOString();
 
   const areaAdmin = randomUUID();
